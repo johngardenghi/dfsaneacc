@@ -1,0 +1,234 @@
+program nitsolma
+
+  use iso_c_binding, only: c_ptr, c_loc, c_f_pointer
+
+  implicit none
+
+  type :: pdata_type
+     character(len=50) :: pname
+     real(kind=8), allocatable :: crhs(:)
+  end type pdata_type
+
+  ! LOCAL SCALARS
+  integer :: allocstat,m,n,ipar,iterm,itrmf
+  real(kind=8) :: ftol,stptol
+  real :: finish,start
+  type(pdata_type), target :: pdata
+
+  ! LOCAL ARRAYS
+  real(kind=8), allocatable :: r(:),x(:),rwork(:),rpar(:)
+  integer :: input(11),info(6)
+
+  ! EXTERNAL FUNCTIONS
+  integer, external :: ddot,dnrm2
+
+  call iniprob(n,x,c_loc(pdata))
+
+  m = 20
+
+  allocate(r(n),rpar(n),rwork( n * ( m + 5 ) + m * ( m + 3 ) ),stat=allocstat)
+  if ( allocstat .ne. 0 ) then
+     write(*,*) 'Error in allocate.'
+     stop
+  end if
+
+  ftol = 1.0d-6 * sqrt( real( n ) )   ! stop when || F(xk) ||_2 <= ftol
+  stptol = 0.0d0             ! stopping tolerance on the steplength (value given in the Bratu example)
+
+  input(1:10) =   0  ! set everything to default values
+  input(1) = huge(1) ! maximum number of nonlinear iterations (default 200)
+
+  rpar(1:n) = pdata%crhs(1:n)
+
+  call evalr (n,x,r,rpar,ipar,itrmf)
+
+  open(10,file='tabline.txt')
+  write(10,9000) pdata%pname,n,9,norm2(r(1:n)), 0, 0, 0.0
+  close(10)
+
+  call cpu_time(start)
+  call nitsol(n,x,evalr,jac,ftol,stptol,input,info,rwork,rpar,ipar,iterm,ddot,dnrm2)
+  call cpu_time(finish)
+
+  call evalr (n,x,r,rpar,ipar,itrmf)
+
+  write(*,*) 'Satisfied stopping criterion = ',iterm
+  write(*,*) 'Residual Euclidian norm = ',norm2( r(1:n) )
+  write(*,*) 'Number of iterations = ',info(5) != iter nao deveria ser iter(5)?
+  write(*,*) 'Number of functional evaluations = ',info(1)!=fcnt
+  write(*,*) 'CPU time in seconds = ',finish - start
+
+  open(10,file='tabline.txt')
+  write(10,9000) pdata%pname,n,iterm,norm2(r(1:n)), info(5), info(1), finish-start
+  close(10)
+
+  deallocate(x,r,rwork,rpar,stat=allocstat)
+  if ( allocstat .ne. 0 ) then
+     write(*,*) 'Error in deallocate.'
+     stop
+  end if
+
+  stop
+
+9000 format(A50,1X,I6,1X,I2,1X,1P,D7.1,2(1X,I10),1X,0P,F12.6)
+
+contains
+
+  ! ******************************************************************
+  ! ******************************************************************
+
+  subroutine iniprob(n,x,pdataptr)
+
+    ! SCALAR ARGUMENTS
+    integer, intent(out) :: n
+    type(c_ptr), optional, intent(in) :: pdataptr
+
+    ! ARRAY ARGUMENTS
+    real(kind=8), allocatable :: x(:)
+
+    ! LOCAL SCALARS
+    integer :: allocstat,m,status,e_order,l_order,v_order
+    type(pdata_type), pointer :: pdata
+
+    ! LOCAL ARRAYS
+    logical, allocatable :: equatn(:),linear(:)
+    real(kind=8), allocatable :: cl(:),l(:),u(:),lambda(:)
+
+    call c_f_pointer(pdataptr,pdata)
+
+    open(10,file='OUTSDIF.d',form='formatted',status='old')
+
+    rewind 10
+
+    call cutest_pname(status,10,pdata%pname)
+    if ( status .ne. 0 ) then
+       write(*,*) 'INIPROB ERROR: cutest_pname - status not equal to zero. status = ',status
+       stop
+    end if
+
+    call cutest_cdimen(status,10,n,m)
+    if ( status .ne. 0 ) then
+       write(*,*) 'INIPROB ERROR: cutest_cdimen - status not equal to zero. status = ',status
+       stop
+    end if
+
+    if ( n .ne. m ) then
+       write(*,*) 'INIPROB ERROR: This program tackles nonlinear systems with n=m only!',pdata%pname
+       stop
+    end if
+
+    allocate(l(n),u(n),lambda(m),cl(m),equatn(m),linear(m),x(n),pdata%crhs(m),stat=allocstat)
+    if ( allocstat .ne. 0 ) then
+       write(*,*) 'INIPROB ERROR: Allocation error.'
+       stop
+    end if
+
+    e_order = 1
+    l_order = 0
+    v_order = 0
+
+    call CUTEST_csetup(status,10,6,20,n,m,x,l,u,lambda,cl,pdata%crhs,equatn,linear,e_order,l_order,v_order)
+    if ( status .ne. 0 ) then
+       write(*,*) 'INIPROB ERROR: cutest_csetup - status not equal to zero. status = ',status
+       stop
+    end if
+
+    if ( any( .not. equatn(1:m) ) ) then
+       write(*,*) 'INIPROB ERROR: The problem has inequalities!'
+       stop
+    end if
+
+    if ( any( cl(1:m) .ne. pdata%crhs(m) ) ) then
+       write(*,*) 'INIPROB ERROR: The problem has an equality with cl not equal to cu!'
+       stop
+    end if
+
+    if ( any( l(1:n) .gt. - 1.0d+20 ) .or. any( u(1:n) .lt. 1.0d+20 ) ) then
+       write(*,*) 'INIPROB ERROR: The problem has bounds!'
+       stop
+    end if
+
+    close(10)
+
+    deallocate(l,u,lambda,cl,equatn,linear,stat=allocstat)
+    if ( allocstat .ne. 0 ) then
+       write(*,*) 'INIPROB ERROR: Deallocation error.'
+       stop
+    end if
+
+  end subroutine iniprob
+
+  ! ******************************************************************
+  ! ******************************************************************
+
+  subroutine endprob(pdataptr)
+
+    ! SCALAR ARGUMENTS
+    type(c_ptr), optional, intent(in) :: pdataptr
+
+    ! LOCAL SCALARS
+    integer :: allocstat,status
+    type(pdata_type), pointer :: pdata
+
+    call c_f_pointer(pdataptr,pdata)
+
+    deallocate(pdata%crhs,stat=allocstat)
+    if ( allocstat .ne. 0 ) then
+       write(*,*) 'Error in allocate statement!'
+       stop
+    end if
+
+    call cutest_cterminate(status)
+
+  end subroutine endprob
+
+  ! ******************************************************************
+  ! ******************************************************************
+
+  subroutine evalr(n,x,r,rpar,ipar,flag)
+
+    ! SCALAR ARGUMENTS
+    integer, intent(in) :: n,ipar
+    integer, intent(out) :: flag
+
+    ! ARRAY ARGUMENTS
+    real(kind=8), intent(in) :: x(n), rpar(n)
+    real(kind=8), intent(out) :: r(n)
+
+    ! LOCAL SCALARS
+    integer :: jfun(1),jvar(1),jnnz,status
+    real(kind=8) :: jval(1)
+
+    flag = 0
+
+    call cutest_ccfsg(status,n,n,x,r,jnnz,1,jval,jvar,jfun,.false.)
+    if ( status .ne. 0 ) then
+       write(*,*) 'INIPROB ERROR: There was a nonnull flag in a call to CUTEst routine cutest_ccfsg'
+       stop
+    end if
+
+    r(1:n) = r(1:n) - rpar(1:n)
+
+  end subroutine evalr
+
+  ! ******************************************************************
+  ! ******************************************************************
+
+  subroutine jac(n,x,r,ijob,v,z,dpar,ipar,flag)
+
+    ! SCALAR ARGUMENTS
+    integer, intent(in) :: ijob,n
+    integer, intent(out) :: flag
+
+    ! ARRAY ARGUMENTS
+    integer, intent(in) :: ipar(*)
+    real(kind=8), intent(in) :: dpar(*),x(n),r(n),v(n)
+    real(kind=8), intent(out) :: z(n)
+
+    flag = 1
+
+    write(*,*) 'jac should not be called!'
+
+  end subroutine jac
+
+end program nitsolma
