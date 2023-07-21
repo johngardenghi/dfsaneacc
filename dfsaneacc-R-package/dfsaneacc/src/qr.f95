@@ -287,13 +287,13 @@ contains
        call exit()
     end if
 
-    if ( any( isnan( Q(1:n,1:rank) ) ) .or. any( isnan( R(1:rank,1:m) ) ) ) then
+    if ( any( Q(1:n,1:rank) /= Q(1:n,1:rank) ) .or. any( R(1:rank,1:m) /= R(1:rank,1:m) ) ) then
        ! write(*,*) 'ERROR in subroutine qrupdate: NaN in Q or R!'
        call exit()
     end if
 
     if ( newcolp .ne. 0 ) then
-       if ( any( isnan( newcol(1:n) ) ) ) then
+       if ( any( newcol(1:n) /= newcol(1:n) ) ) then
           ! write(*,*) 'ERROR in subroutine qrupdate: NaN in newcol!'
           call exit()
        end if
@@ -400,7 +400,7 @@ contains
 
        m = m - 1
 
-       if ( any( isnan( Q(1:n,1:rank) ) ) .or. any( isnan( R(1:rank,1:m) ) ) ) then
+       if ( any( Q(1:n,1:rank) /= Q(1:n,1:rank) ) .or. any( R(1:rank,1:m) /= R(1:rank,1:m) ) ) then
           ! write(*,*) 'ERROR in subroutine qrupdate: NaN was created! (place 1)'
           call exit()
        end if
@@ -451,7 +451,7 @@ contains
        call exit()
     end if
 
-    if ( any( isnan( Q(1:n,1:rank) ) ) .or. any( isnan( R(1:rank,1:m) ) ) ) then
+    if ( any( Q(1:n,1:rank) /= Q(1:n,1:rank) ) .or. any( R(1:rank,1:m) /= R(1:rank,1:m) ) ) then
        ! write(*,*) 'ERROR in subroutine qrupdate: NaN was created! (place 2)'
        call exit()
     end if
@@ -478,7 +478,7 @@ contains
     ! LOCAL ARRAYS
     real(c_double) :: kap(rank),Rt(m,rank)
 
-    if ( any( isnan( b(1:n) ) ) .or. any( isnan( Q(1:n,1:rank) ) ) .or. any( isnan( R(1:rank,1:m) ) ) ) then
+    if ( any( b(1:n) /= b(1:n) ) .or. any( Q(1:n,1:rank) /= Q(1:n,1:rank) ) .or. any( R(1:rank,1:m) /= R(1:rank,1:m) ) ) then
        ! write(*,*) 'ERROR in subroutine qrsolve: NaN in Q, R, or b!'
        call exit()
     end if
