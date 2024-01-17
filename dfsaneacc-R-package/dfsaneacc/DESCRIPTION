@@ -1,7 +1,7 @@
 Package: dfsaneacc
 Title: Accelerated Derivative-Free Method for Large-Scale Nonlinear Systems of Equations
-Version: 1.0.0
-Date: 2023-03-30
+Version: 1.0.1
+Date: 2024-01-17
 Authors@R: c(person("Ernesto G.", "Birgin", role=c("aut", "ctb")),
   person("John L.", "Gardenghi", role=c("aut", "cre", "ctb", "trl"), email="john.gardenghi@unb.br"),
   person("Diaulas S.", "Marcondes", role=c("aut", "ctb", "trl")),
@@ -14,7 +14,6 @@ Maintainer: John L. Gardenghi <john.gardenghi@unb.br>
 NeedsCompilation: yes
 Description: Secant acceleration applied to derivative-free Spectral
   Residual Methods for solving large-scale nonlinear systems of
-  equations. The main references follows: W. La Cruz, J. M. Martinez,
-  and M. Raydan (2006) <doi:10.1090/S0025-5718-06-01840-0>;
-  E. G. Birgin and J. M. Martinez (2022) <doi:10.1137/20M1388024>.
+  equations. The main reference follows: E. G. Birgin and
+  J. M. Martinez (2022) <doi:10.1137/20M1388024>.
 License: GPL-3
