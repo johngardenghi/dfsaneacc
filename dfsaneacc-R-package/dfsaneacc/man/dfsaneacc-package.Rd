@@ -24,10 +24,10 @@
   J. Barzilai, and J. M. Borwein (1988), Two-point step size gradient
   methods, \emph{IMA J Numerical Analysis}, 8, 141-148.
 
-  E. G. Birgin, J. M. Mart\'inez (2021), Secant acceleration of sequential
-  residual methods for solving large-scale nonlinear systems of
-  equations. \emph{Technical Report arXiv:2012.13251v1,arXiv}. URL:
-  \url{https://arxiv.org/abs/2012.13251}.
+  E. G. Birgin, J. M. Mart\'inez (2022), Secant acceleration of
+  sequential residual methods for solving large-scale nonlinear systems
+  of equations, \emph{SIAM Journal on Numerical Analysis}, 60(6),
+  3145-3180.
 
   W. LaCruz, and M. Raydan (2003), Nonmonotone spectral methods for
   large-scale nonlinear systems, \emph{Optimization Methods and
@@ -39,7 +39,7 @@
   1429-1448.
 
   M. Raydan (1997), Barzilai-Borwein gradient method for large-scale
-  unconstrained minimization problem, \emph{SIAM J of Optimization}, 7,
-  26-33.
+  unconstrained minimization problem, \emph{SIAM Journal on
+    Optimization}, 7, 26-33.
 }
 \keyword{package}

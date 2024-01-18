@@ -1,3 +1,11 @@
-Changes in dfsaneacc version 1.0
+Changes in dfsaneacc version 1.0.2
+
+   - updating manual with the published version of acceleration paper.
+
+Changes in dfsaneacc version 1.0.1
+
+   - removing deprecated calls to isnan Fortran code from qr.f95 source.
+
+Changes in dfsaneacc version 1.0.0
 
    - first release.
