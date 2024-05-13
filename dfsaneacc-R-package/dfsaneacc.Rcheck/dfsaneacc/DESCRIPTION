@@ -1,5 +1,6 @@
 Package: dfsaneacc
-Title: Accelerated Derivative-Free Method for Large-Scale Nonlinear Systems of Equations
+Title: Accelerated Derivative-Free Method for Large-Scale Nonlinear
+        Systems of Equations
 Version: 1.0.3
 Date: 2024-05-13
 Authors@R: c(person("Ernesto G.", "Birgin", role=c("aut", "ctb")),
@@ -17,3 +18,5 @@ Description: Secant acceleration applied to derivative-free Spectral
   equations. The main reference follows: E. G. Birgin and
   J. M. Martinez (2022) <doi:10.1137/20M1388024>.
 License: GPL-3
+Packaged: 2024-05-13 17:52:54 UTC; john
+Built: R 4.1.2; x86_64-pc-linux-gnu; 2024-05-13 17:54:37 UTC; unix

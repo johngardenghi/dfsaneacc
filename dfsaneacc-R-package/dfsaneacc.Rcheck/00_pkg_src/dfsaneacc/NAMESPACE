@@ -1,0 +1,2 @@
+useDynLib(dfsaneacc, .registration=TRUE)
+export(dfsaneacc)

@@ -1,0 +1,122 @@
+
+R version 4.1.2 (2021-11-01) -- "Bird Hippie"
+Copyright (C) 2021 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "dfsaneacc"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> base::assign(".ExTimings", "dfsaneacc-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('dfsaneacc')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("dfsaneacc")
+> ### * dfsaneacc
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: dfsaneacc
+> ### Title: Accelerated derivative-free spectral residual method for
+> ###   nonlinear systems of equations
+> ### Aliases: dfsaneacc
+> ### Keywords: large-scale
+> 
+> ### ** Examples
+> 
+> n <- 3
+> x0 <- rep(1/n^2, n)
+> 
+> expfun2 <- function(x) {
++     n <- length(x)
++     f <- rep(NA, n)
++     f[1] <- exp(x[1]) - 1.0
++     f[2:n] <- (2:n)/10.0 * (exp(x[2:n]) + x[1:n-1] - 1)
++     f
++ }
+> 
+> ret <- dfsaneacc(x=x0, evalr=expfun2, nhlim=6, epsf=1.0e-6*sqrt(n),
++ iprint=0)
+Iter: 0 f = 0.0206060602061034
+
+Iter: 1 f = 0.00121561224882289
+
+Iter: 2 f = 4.68924975986739e-05
+
+Iter: 3 f = 4.65441910537703e-08
+
+Iter: 4 f = 1.13519760192562e-11
+
+Iter: 5 f = 9.15460334385531e-16
+
+success!
+
+> ret
+$x
+              [,1]
+[1,] -3.582692e-11
+[2,] -7.222425e-08
+[3,] -1.638214e-08
+
+$res
+[1] -3.582690e-11 -1.445201e-08 -2.658192e-08
+
+$normF
+[1] 9.154603e-16
+
+$iter
+[1] 5
+
+$fcnt
+[1] 11
+
+$istop
+[1] 0
+
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("dfsaneacc", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.099 0.017 0.117 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')
